@@ -1,4 +1,4 @@
-# uqaq_typing_learn
+# uqac_doigts_rapides
 
 Application d'apprentissage de la frappe rapide.
 
