@@ -1,0 +1,37 @@
+name: Vérifications de Base
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Installer les dépendances
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - name: Vérifier la syntaxe Python
+      run: |
+        if [ -f main.py ] && [ -s main.py ]; then
+          python -m py_compile main.py
+        else
+          echo "Note: main.py est vide ou n'existe pas encore"
+        fi
+    
+    - name: Afficher le statut
+      run: echo "✅ Vérifications de base terminées"
