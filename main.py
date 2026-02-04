@@ -44,7 +44,7 @@ while running:
             if event.key == pygame.K_BACKSPACE:
                 input_text = input_text[:-1]
                 
-    render_text(input_text)
+    #render_text(input_text)
     pygame.display.flip()
 
 pygame.quit()
