@@ -12,7 +12,7 @@ backgroundColor = "#FAF9F6"
 fontColor = "black"
 screen = pygame.display.set_mode((W, H))
 pygame.display.set_caption("Doigts rapide - test saisie")
-font = pygame.font.Font(police, 70)
+font = pygame.font.Font(police, 50)
 
 # Initialisation des paramètres par défaut pour render_text
 init_render(surface=screen, font=font, color=fontColor, background=backgroundColor, pos=(20, 30))
