@@ -10,7 +10,7 @@ police = "fonts/OpenDyslexic-Regular.otf"
 W, H = 1080, 720
 backgroundColor = "#FAF9F6"
 fontColor = "black"
-screen = pygame.display.set_mode((W, H))
+screen = pygame.display.set_mode((W, H), pygame.FULLSCREEN | pygame.SCALED)
 pygame.display.set_caption("Doigts rapide - test saisie")
 font = pygame.font.Font(police, 50)
 
