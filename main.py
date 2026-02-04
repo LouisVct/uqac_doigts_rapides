@@ -10,6 +10,8 @@ police = "fonts/OpenDyslexic-Regular.otf"
 
 info_screen = pygame.display.Info()
 
+pygame.mouse.set_visible(False)
+
 screen_width = info_screen.current_w
 screen_height = info_screen.current_h
 
