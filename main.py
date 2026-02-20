@@ -1,51 +1,51 @@
-
 import pygame
 import sys
-from render import render_text, init_render
+from screenText import ScreenText
+from screenKeyboard import ScreenKeyboard
 
 
 pygame.init()
 
-police = "fonts/OpenDyslexic-Regular.otf"
-
 info_screen = pygame.display.Info()
+
+screen_width = info_screen.current_w
+
+screen_height = info_screen.current_h
 
 pygame.mouse.set_visible(False)
 
-screen_width = info_screen.current_w
-screen_height = info_screen.current_h
-
-backgroundColor = "#FAF9F6"
-fontColor = "black"
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
 pygame.display.set_caption("Doigts rapide - test saisie")
-font = pygame.font.Font(police, 50)
 
-# Initialisation des paramètres par défaut pour render_text
-init_render(surface=screen, font=font, color=fontColor, background=backgroundColor, pos=(20, 30))
+text_height = int(screen_height * 0.4)
+keyboard_height = screen_height - text_height
 
-input_text = ""
+text_zone = pygame.Rect(0, 0, screen_width, text_height)
+keyboard_zone = pygame.Rect(0, text_height, screen_width, keyboard_height)
+
+screen_text = ScreenText(surface=screen, zone_rect=text_zone)
+screen_keyboard = ScreenKeyboard(surface=screen, zone_rect=keyboard_zone)
+
 clock = pygame.time.Clock()
 running = True
+input_text = ""
 
 while running:
-    screen.fill(backgroundColor)
-    clock.tick(60)
+	clock.tick(60)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			running = False
+		elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+			running = False
+		elif event.type == pygame.TEXTINPUT:
+			input_text += event.text
+		elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
+			input_text = input_text[:-1]
 
-        if event.type == pygame.TEXTINPUT:
-            input_text += event.text
-            
-
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_BACKSPACE:
-                input_text = input_text[:-1]
-                
-    #render_text(input_text)
-    pygame.display.flip()
+	screen_text.draw(input_text)
+	screen_keyboard.draw()
+	pygame.display.flip()
 
 pygame.quit()
 sys.exit()
