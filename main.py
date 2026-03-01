@@ -1,5 +1,6 @@
 import pygame
 import sys
+from clavier import ModeleClavier
 from screenText import ScreenText
 from screenKeyboard import ScreenKeyboard
 
@@ -24,7 +25,8 @@ text_zone = pygame.Rect(0, 0, screen_width, text_height)
 keyboard_zone = pygame.Rect(0, text_height, screen_width, keyboard_height)
 
 screen_text = ScreenText(surface=screen, zone_rect=text_zone)
-screen_keyboard = ScreenKeyboard(surface=screen, zone_rect=keyboard_zone)
+modele = ModeleClavier("clavier.json")
+screen_keyboard = ScreenKeyboard(surface=screen, modele_clavier=modele)
 
 clock = pygame.time.Clock()
 running = True
