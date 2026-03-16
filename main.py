@@ -3,6 +3,8 @@ import sys
 from clavier import ModeleClavier
 from screenText import ScreenText
 from screenKeyboard import ScreenKeyboard
+from moteur import MoteurExercice
+from modes import charger_texte_fichier, generer_texte_aleatoire
 
 
 pygame.init()
@@ -30,7 +32,17 @@ screen_keyboard = ScreenKeyboard(surface=screen, modele_clavier=modele)
 
 clock = pygame.time.Clock()
 running = True
-input_text = ""
+
+MODE = "file"
+TEXT_FILE = "texte.txt"
+RANDOM_LEN = 200
+
+if MODE == "file":
+	texte = charger_texte_fichier(TEXT_FILE)
+else:
+	texte = generer_texte_aleatoire(RANDOM_LEN)
+
+moteur = MoteurExercice(texte)
 
 while running:
 	clock.tick(60)
@@ -38,14 +50,10 @@ while running:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
-		elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-			running = False
 		elif event.type == pygame.TEXTINPUT:
-			input_text += event.text
-		elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
-			input_text = input_text[:-1]
+			moteur.traiter_entree(event.text)
 
-	screen_text.draw(input_text)
+	screen_text.draw(moteur)
 	screen_keyboard.draw()
 	pygame.display.flip()
 
