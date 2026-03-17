@@ -1,10 +1,12 @@
 import pygame
 import sys
+import time
 from clavier import ModeleClavier
 from screenText import ScreenText
 from screenKeyboard import ScreenKeyboard
 from moteur import MoteurExercice
 from modes import charger_texte_fichier, generer_texte_aleatoire
+from aide import Aide, Level, Couleur
 
 
 pygame.init()
@@ -43,6 +45,10 @@ else:
 	texte = generer_texte_aleatoire(RANDOM_LEN)
 
 moteur = MoteurExercice(texte)
+aide = Aide(Level.EASY, modele, Couleur.VERTE)
+
+derniere_entree = time.monotonic()
+lettre_aide_active = None
 
 while running:
 	clock.tick(60)
@@ -51,7 +57,28 @@ while running:
 		if event.type == pygame.QUIT:
 			running = False
 		elif event.type == pygame.TEXTINPUT:
+			attendu_avant = moteur.caractere_attendu
 			moteur.traiter_entree(event.text)
+			derniere_entree = time.monotonic()
+
+			if attendu_avant is not None:
+				if event.text == attendu_avant:
+					if lettre_aide_active is not None:
+						aide.reset_erreur(lettre_aide_active)
+						lettre_aide_active = None
+				else:
+					if lettre_aide_active is not None and lettre_aide_active != attendu_avant:
+						aide.reset_erreur(lettre_aide_active)
+					aide.erreur(attendu_avant)
+					lettre_aide_active = attendu_avant
+
+	if not moteur.est_termine and (time.monotonic() - derniere_entree) > 5:
+		attendu = moteur.caractere_attendu
+		if attendu is not None and lettre_aide_active != attendu:
+			if lettre_aide_active is not None:
+				aide.reset_erreur(lettre_aide_active)
+			aide.erreur(attendu)
+			lettre_aide_active = attendu
 
 	screen_text.draw(moteur)
 	screen_keyboard.draw()

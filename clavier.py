@@ -10,6 +10,9 @@ class Touche:
         self.background_color = background_color
         self.text_color = text_color
         self.rect = None
+        self.default_frame_color = frame_color
+        self.default_background_color = background_color
+        self.default_text_color = text_color
 
 
 
@@ -68,4 +71,23 @@ class ModeleClavier:
 
             # on ajoute la ligne terminée à notre liste globale
             self.lignes_touches.append(ligne_objets)
+
+    def get_touche(self, lettre):
+        if not lettre:
+            return None
+        return self.dictionnaire_touches.get(lettre.lower())
+
+    def set_touche_background(self, lettre, couleur):
+        touche = self.get_touche(lettre)
+        if touche is None:
+            return False
+        touche.background_color = couleur
+        return True
+
+    def reset_touche_background(self, lettre):
+        touche = self.get_touche(lettre)
+        if touche is None:
+            return False
+        touche.background_color = touche.default_background_color
+        return True
 
