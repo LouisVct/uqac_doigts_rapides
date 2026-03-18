@@ -77,6 +77,12 @@ class ModeleClavier:
             return None
         return self.dictionnaire_touches.get(lettre.lower())
 
+    def get_caracteres_disponibles(self):
+        return list(self.dictionnaire_touches.keys())
+
+    def contient_caractere(self, caractere):
+        return self.get_touche(caractere) is not None
+
     def set_touche_background(self, lettre, couleur):
         touche = self.get_touche(lettre)
         if touche is None:
