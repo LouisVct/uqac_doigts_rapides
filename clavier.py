@@ -20,6 +20,7 @@ class ModeleClavier:
     def __init__(self, chemin_json):
         self.lignes_touches = []       # liste de listes (pour l'affichage ligne par ligne)
         self.dictionnaire_touches = {} # dictionnaire (pour la recherche ultra-rapide)
+        self.dictionnaire_compositions = {}
         
         self.charger_depuis_json(chemin_json)
 
@@ -72,16 +73,84 @@ class ModeleClavier:
             # on ajoute la ligne terminée à notre liste globale
             self.lignes_touches.append(ligne_objets)
 
+        # caractères spéciaux composés, ex: é = ' + e
+        compositions = donnees.get("compositions_speciales", {})
+        for caractere_final, sequence in compositions.items():
+            if not isinstance(sequence, list):
+                continue
+
+            sequence_normalisee = []
+            for symbole in sequence:
+                if isinstance(symbole, str) and symbole:
+                    sequence_normalisee.append(symbole.lower())
+
+            if sequence_normalisee:
+                self.dictionnaire_compositions[caractere_final.lower()] = sequence_normalisee
+
     def get_touche(self, lettre):
         if not lettre:
             return None
         return self.dictionnaire_touches.get(lettre.lower())
+
+    def get_composition_speciale(self, caractere):
+        if not caractere:
+            return None
+        return self.dictionnaire_compositions.get(caractere.lower())
+
+    def get_touches_aide(self, caractere):
+        if not caractere:
+            return []
+
+        composition = self.get_composition_speciale(caractere)
+        if composition:
+            touches = []
+            deja_vu = set()
+            composition_complete = True
+
+            for symbole in composition:
+                touche = self.get_touche(symbole)
+                if touche is None:
+                    composition_complete = False
+                    break
+
+                identifiant = id(touche)
+                if identifiant in deja_vu:
+                    continue
+
+                deja_vu.add(identifiant)
+                touches.append(touche)
+
+            if composition_complete and touches:
+                return touches
+
+        touche = self.get_touche(caractere)
+        if touche is None:
+            return []
+        return [touche]
 
     def get_caracteres_disponibles(self):
         return list(self.dictionnaire_touches.keys())
 
     def contient_caractere(self, caractere):
         return self.get_touche(caractere) is not None
+
+    def set_touches_background_pour_caractere(self, caractere, couleur):
+        touches = self.get_touches_aide(caractere)
+        if not touches:
+            return False
+
+        for touche in touches:
+            touche.background_color = couleur
+        return True
+
+    def reset_touches_background_pour_caractere(self, caractere):
+        touches = self.get_touches_aide(caractere)
+        if not touches:
+            return False
+
+        for touche in touches:
+            touche.background_color = touche.default_background_color
+        return True
 
     def set_touche_background(self, lettre, couleur):
         touche = self.get_touche(lettre)

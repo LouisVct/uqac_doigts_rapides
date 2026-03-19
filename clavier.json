@@ -79,6 +79,16 @@
             {"caracteres": ["menu"], "largeur" : 2.7},
             {"caracteres": ["ctrl droit"], "largeur" : 2.7}
         ]
-    ]
+    ],
+    "compositions_speciales" : {
+        "é": ["'", "e"],
+        "è": ["`", "e"],
+        "ê": ["^", "e"],
+        "ù": ["`", "u"],
+        "à": ["`", "a"],
+        "ô": ["^", "o"],
+        "â": ["^", "a"],
+        "î": ["^", "i"]
+    }
 
 }

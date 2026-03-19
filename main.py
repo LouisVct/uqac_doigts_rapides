@@ -1,6 +1,7 @@
 import pygame
 import sys
 import time
+import os
 from clavier import ModeleClavier
 from screenText import ScreenText
 from screenKeyboard import ScreenKeyboard
@@ -10,6 +11,11 @@ from aide import Aide, Level, Couleur
 
 
 pygame.init()
+
+try:
+	pygame.mixer.init()
+except pygame.error:
+	pass
 
 info_screen = pygame.display.Info()
 
@@ -47,6 +53,14 @@ else:
 moteur = MoteurExercice(texte)
 aide = Aide(Level.EASY, modele, Couleur.VERTE)
 
+son_erreur = None
+try:
+	chemin_son_erreur = os.path.join("songs", "faaa.mp3")
+	son_erreur = pygame.mixer.Sound(chemin_son_erreur)
+	son_erreur.set_volume(0.7)
+except (pygame.error, FileNotFoundError):
+	son_erreur = None
+
 derniere_entree = time.monotonic()
 lettre_aide_active = None
 
@@ -67,6 +81,8 @@ while running:
 						aide.reset_erreur(lettre_aide_active)
 						lettre_aide_active = None
 				else:
+					if son_erreur is not None:
+						son_erreur.play()
 					if lettre_aide_active is not None and lettre_aide_active != attendu_avant:
 						aide.reset_erreur(lettre_aide_active)
 					aide.erreur(attendu_avant)
