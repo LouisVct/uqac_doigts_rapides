@@ -2,16 +2,16 @@ import pygame
 import sys
 import time
 import os
-from clavier import ModeleClavier
-from screenText import ScreenText
-from screenKeyboard import ScreenKeyboard
-from moteur import MoteurExercice
-from modes import (
+from core.clavier import ModeleClavier
+from ui.screenText import ScreenText
+from ui.screenKeyboard import ScreenKeyboard
+from core.moteur import MoteurExercice
+from app.modes import (
 	charger_texte_fichier,
 	FournisseurLettresUniques,
 	FournisseurMotsUniques,
 )
-from aide import Aide, Level, Couleur
+from core.aide import Aide, Level, Couleur
 
 
 pygame.init()

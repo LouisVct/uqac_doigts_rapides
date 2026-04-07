@@ -1,5 +1,5 @@
 from enum import Enum
-from clavier import ModeleClavier
+from core.clavier import ModeleClavier
 
 class Level(Enum):
     EASY = "level_1"
