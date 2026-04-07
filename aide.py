@@ -19,12 +19,38 @@ class Aide:
     def _couleurs_aide(self):
         return Couleur.VERTE.value, Couleur.VERTE_CLAIRE.value
 
+    def _touche_maj(self):
+        for nom in ("maj gauche", "maj droit", "fix maj"):
+            touche = self.clavier.get_touche(nom)
+            if touche is not None:
+                return touche
+        return None
+
+    def _touches_aide_pour_lettre(self, lettre: str):
+        if not lettre:
+            return []
+
+        if lettre.isalpha() and lettre.isupper():
+            touche_maj = self._touche_maj()
+            touche_lettre = self.clavier.get_touche(lettre.lower())
+
+            touches = []
+            if touche_maj is not None:
+                touches.append(touche_maj)
+            if touche_lettre is not None:
+                touches.append(touche_lettre)
+
+            if touches:
+                return touches
+
+        return self.clavier.get_touches_aide(lettre)
+
     def erreur(self, lettre: str):
         if self.level != Level.EASY:
             return False
 
         couleur_principale, couleur_secondaire = self._couleurs_aide()
-        touches = self.clavier.get_touches_aide(lettre)
+        touches = self._touches_aide_pour_lettre(lettre)
         if not touches:
             return False
 
@@ -39,5 +65,11 @@ class Aide:
         
 
     def reset_erreur(self, lettre: str):
-        return self.clavier.reset_touches_background_pour_caractere(lettre)
+        touches = self._touches_aide_pour_lettre(lettre)
+        if not touches:
+            return False
+
+        for touche in touches:
+            touche.background_color = touche.default_background_color
+        return True
 

@@ -7,7 +7,7 @@ class ScreenText:
         self,
         surface,
         zone_rect,
-        font_path="fonts/OpenDyslexic-Regular.otf",
+        font_path="assets/fonts/OpenDyslexic-Regular.otf",
         font_size=50,
         background_color="#FAF9F6",
         font_color="black",
@@ -17,13 +17,21 @@ class ScreenText:
         self.zone_rect = zone_rect
         self.background_color = background_color
         self.font_color = font_color
+        self.font_path = font_path
+        self.font_size = font_size
         self.font = pygame.font.Font(font_path, font_size)
         self.text_pos = text_pos
 
     # affiche le texte et le curseur; découpe en lignes et rend les caractères
-    def draw(self, moteur):
+    def draw(self, moteur, display_mode="classic"):
         pygame.draw.rect(self.surface, self.background_color, self.zone_rect)
 
+        if display_mode == "focus":
+            self._draw_focus(moteur)
+        else:
+            self._draw_classic(moteur)
+
+    def _draw_classic(self, moteur):
         texte = moteur.texte
         index = moteur.index
 
@@ -145,6 +153,37 @@ class ScreenText:
                 i += 1
 
         self.surface.set_clip(prev_clip)
+
+    def _draw_focus(self, moteur):
+        if moteur.est_termine:
+            self._draw_score(moteur)
+            return
+
+        texte = moteur.texte
+        index = moteur.index
+        deja_tape = texte[:index]
+        reste = texte[index:]
+
+        max_font_size = int(self.zone_rect.height * 0.68)
+        max_font_size = max(max_font_size, self.font_size)
+        font_size = max_font_size
+        font_focus = pygame.font.Font(self.font_path, font_size)
+
+        marge_x = 40
+        max_width = self.zone_rect.width - (2 * marge_x)
+        while font_size > self.font_size and font_focus.size(texte)[0] > max_width:
+            font_size -= 4
+            font_focus = pygame.font.Font(self.font_path, font_size)
+
+        partie_ok = font_focus.render(deja_tape, True, (0, 140, 0), self.background_color)
+        partie_ko = font_focus.render(reste, True, (0, 0, 0), self.background_color)
+
+        total_width = partie_ok.get_width() + partie_ko.get_width()
+        x_depart = self.zone_rect.centerx - (total_width // 2)
+        y = self.zone_rect.centery - (font_focus.get_linesize() // 2)
+
+        self.surface.blit(partie_ok, (x_depart, y))
+        self.surface.blit(partie_ko, (x_depart + partie_ok.get_width(), y))
 
     # affiche l'écran de score final (fautes, temps)
     def _draw_score(self, moteur):
