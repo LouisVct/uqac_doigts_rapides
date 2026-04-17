@@ -139,7 +139,7 @@ def ecran_configuration(surface, clock):
 
 		dessiner_fond_hub()
 
-		titre = font_titre.render("Hub de demarrage", True, (28, 28, 28))
+		titre = font_titre.render("Bienvenue", True, (28, 28, 28))
 		sous_titre = font_sous_titre.render("Selectionne un mode puis un niveau d'aide", True, (88, 88, 88))
 		surface.blit(titre, titre.get_rect(center=(screen_width // 2, int(screen_height * 0.10))))
 		surface.blit(sous_titre, sous_titre.get_rect(center=(screen_width // 2, int(screen_height * 0.17))))
