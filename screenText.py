@@ -20,6 +20,7 @@ class ScreenText:
         self.font_path = font_path
         self.font_size = font_size
         self.font = pygame.font.Font(font_path, font_size)
+        self._font_cache = {font_size: self.font}
         self.text_pos = text_pos
 
     # affiche le texte et le curseur; découpe en lignes et rend les caractères
@@ -31,33 +32,30 @@ class ScreenText:
         else:
             self._draw_classic(moteur)
 
-    def _draw_classic(self, moteur):
-        texte = moteur.texte
-        index = moteur.index
+    def _get_font(self, size):
+        font = self._font_cache.get(size)
+        if font is None:
+            font = pygame.font.Font(self.font_path, size)
+            self._font_cache[size] = font
+        return font
 
+    def _zone_textuelle(self):
         left_x = self.zone_rect.x + self.text_pos[0]
         top_y = self.zone_rect.y + self.text_pos[1]
         line_height = self.font.get_linesize()
         max_x = self.zone_rect.right - self.text_pos[0]
+        return left_x, top_y, line_height, max_x
 
-        # si l'exercice est terminé, on affiche le score final et on quitte l'affichage
-        if moteur.est_termine:
-            self._draw_score(moteur)
-            return
-
-        # on découpe le texte en lignes, en essayant de couper sur les espaces
-        # ça évite d'avoir des mots cassés et des retours à la ligne bizarres
-        # on va découper le texte en lignes en parcourant chaque caractère
+    def _decouper_lignes(self, texte, left_x, max_x):
         lines = []
         line_start = 0
         cursor_x = left_x
         last_space = -1
         i = 0
         n = len(texte)
-        # boucle principale: parcourir tout le texte
+
         while i < n:
             ch = texte[i]
-            # si on rencontre un retour à la ligne explicite, terminer la ligne
             if ch == "\n":
                 lines.append((line_start, i + 1))
                 line_start = i + 1
@@ -66,48 +64,64 @@ class ScreenText:
                 i += 1
                 continue
 
-            # mesurer la largeur du caractère
             ch_width = self.font.size(ch)[0]
-            # si le caractère dépasse la largeur de la zone, il faut couper la ligne
             if cursor_x + ch_width > max_x and i > line_start:
-                # si on a trouvé un espace sur la ligne, couper après cet espace
                 if last_space >= line_start:
-                    # couper après l'espace trouvé pour ne pas casser le mot
                     lines.append((line_start, last_space + 1))
                     line_start = last_space + 1
                     i = line_start
                 else:
-                    # pas d'espace: couper à la position courante
                     lines.append((line_start, i))
                     line_start = i
                 cursor_x = left_x
                 last_space = -1
                 continue
 
-            # mémoriser la position du dernier espace vu (utile pour couper proprement)
             if ch == " ":
                 last_space = i
 
             cursor_x += ch_width
             i += 1
 
-        # si du texte reste après la dernière coupe, l'ajouter comme dernière ligne
         if line_start <= n:
             lines.append((line_start, n))
 
-        # déterminer sur quelle ligne se trouve le curseur (index)
+        return lines
+
+    def _ligne_courante(self, lines, index, texte_len):
         if not lines:
-            # pas de lignes => texte vide
-            current_line = 0
-        else:
-            safe_index = min(index, len(texte))
-            current_line = 0
-            for li, (start_i, end_i) in enumerate(lines):
-                if start_i <= safe_index < end_i:
-                    current_line = li
-                    break
-                if safe_index >= end_i:
-                    current_line = li
+            return 0
+
+        safe_index = min(index, texte_len)
+        current_line = 0
+        for line_number, (line_start, line_end) in enumerate(lines):
+            if line_start <= safe_index < line_end:
+                return line_number
+            if safe_index >= line_end:
+                current_line = line_number
+
+        return current_line
+
+    def _couleurs_caractere(self, char_index, typed_index):
+        if char_index < typed_index:
+            return (0, 140, 0), self.background_color
+        if char_index == typed_index:
+            return (0, 0, 0), (200, 200, 200)
+        return (0, 0, 0), self.background_color
+
+    def _draw_classic(self, moteur):
+        texte = moteur.texte
+        index = moteur.index
+
+        left_x, top_y, line_height, max_x = self._zone_textuelle()
+
+        # si l'exercice est terminé, on affiche le score final et on quitte l'affichage
+        if moteur.est_termine:
+            self._draw_score(moteur)
+            return
+
+        lines = self._decouper_lignes(texte, left_x, max_x)
+        current_line = self._ligne_courante(lines, index, len(texte))
 
         available_height = self.zone_rect.height - self.text_pos[1]
         max_lines = max(1, available_height // line_height)
@@ -120,7 +134,7 @@ class ScreenText:
         self.surface.set_clip(self.zone_rect)
 
         # on dessine seulement les lignes visibles (celles qui tiennent dans la zone)
-        for line_no in range(start_line, min(end_line, len(lines))):
+        for line_no in range(start_line, end_line):
             line_start, line_end = lines[line_no]
             cursor_x = left_x
             cursor_y = top_y + (line_no - start_line) * line_height
@@ -136,17 +150,7 @@ class ScreenText:
 
                 ch_width = self.font.size(ch)[0]
 
-                # choisir couleur/arriére-plan selon l'état du caractère
-                if i < index:
-                    fg = (0, 140, 0)
-                    bg = self.background_color
-                elif i == index:
-                    fg = (0, 0, 0)
-                    bg = (200, 200, 200)
-                else:
-                    fg = (0, 0, 0)
-                    bg = self.background_color
-
+                fg, bg = self._couleurs_caractere(i, index)
                 txt_surf = self.font.render(ch, True, fg, bg)
                 self.surface.blit(txt_surf, (cursor_x, cursor_y))
                 cursor_x += ch_width
@@ -167,13 +171,13 @@ class ScreenText:
         max_font_size = int(self.zone_rect.height * 0.68)
         max_font_size = max(max_font_size, self.font_size)
         font_size = max_font_size
-        font_focus = pygame.font.Font(self.font_path, font_size)
+        font_focus = self._get_font(font_size)
 
         marge_x = 40
         max_width = self.zone_rect.width - (2 * marge_x)
         while font_size > self.font_size and font_focus.size(texte)[0] > max_width:
             font_size -= 4
-            font_focus = pygame.font.Font(self.font_path, font_size)
+            font_focus = self._get_font(font_size)
 
         partie_ok = font_focus.render(deja_tape, True, (0, 140, 0), self.background_color)
         partie_ko = font_focus.render(reste, True, (0, 0, 0), self.background_color)

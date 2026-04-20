@@ -4,12 +4,14 @@ import string
 
 
 CARACTERES_INTERDITS = set(",?;.:/ éàèùâêîôûëïüÿ")
+ESPACES_REGEX = re.compile(r"\s+")
+MOTS_REGEX = re.compile(r"\S+")
 
 
 def charger_texte_fichier(path):
     with open(path, "r", encoding="utf-8") as f:
         texte = f.read()
-    texte = re.sub(r"\s+", " ", texte).strip()
+    texte = ESPACES_REGEX.sub(" ", texte).strip()
     return texte
 
 
@@ -22,17 +24,33 @@ def _mot_est_valide(mot):
     return mot.isalpha() and mot.isascii()
 
 
+def _alphabet_filtre(alphabet):
+    return [
+        char
+        for char in alphabet
+        if char not in CARACTERES_INTERDITS and not char.isspace()
+    ]
+
+
+def _dedoublonner_en_conservant_ordre(elements):
+    return list(dict.fromkeys(elements))
+
+
+def _mots_valides_depuis_fichier(path):
+    texte = charger_texte_fichier(path)
+    return [mot.lower() for mot in extraire_mots_valides(texte)]
+
+
 def extraire_mots_valides(texte):
-    mots = re.findall(r"\S+", texte)
+    mots = MOTS_REGEX.findall(texte)
     return [mot for mot in mots if _mot_est_valide(mot)]
 
 
 def generer_mots_aleatoires(path, n=40):
-    texte = charger_texte_fichier(path)
-    mots_valides = extraire_mots_valides(texte)
+    mots_valides = _mots_valides_depuis_fichier(path)
     if not mots_valides:
         raise ValueError("Aucun mot valide trouve dans le texte source.")
-    return " ".join(random.choice(mots_valides).lower() for _ in range(n))
+    return " ".join(random.choice(mots_valides) for _ in range(n))
 
 
 def generer_mot_aleatoire(path):
@@ -41,11 +59,7 @@ def generer_mot_aleatoire(path):
 
 class FournisseurMotsUniques:
     def __init__(self, path, limite=None):
-        texte = charger_texte_fichier(path)
-        mots = [mot.lower() for mot in extraire_mots_valides(texte)]
-
-        # On dedoublonne tout en conservant l'ordre du texte source.
-        mots_uniques = list(dict.fromkeys(mots))
+        mots_uniques = _dedoublonner_en_conservant_ordre(_mots_valides_depuis_fichier(path))
         if not mots_uniques:
             raise ValueError("Aucun mot valide trouve dans le texte source.")
 
@@ -69,13 +83,9 @@ class FournisseurMotsUniques:
 
 class FournisseurLettresUniques:
     def __init__(self, alphabet=string.ascii_lowercase):
-        lettres = [
-            char
-            for char in alphabet
-            if char not in CARACTERES_INTERDITS and not char.isspace()
-        ]
+        lettres = _alphabet_filtre(alphabet)
         # On supprime les doublons en conservant l'ordre.
-        lettres_uniques = list(dict.fromkeys(lettres))
+        lettres_uniques = _dedoublonner_en_conservant_ordre(lettres)
         if not lettres_uniques:
             raise ValueError("Aucune lettre autorisee disponible.")
 
@@ -89,11 +99,7 @@ class FournisseurLettresUniques:
 
 
 def generer_lettres_aleatoires(n=200, alphabet=string.ascii_lowercase):
-    alphabet_filtre = [
-        char
-        for char in alphabet
-        if char not in CARACTERES_INTERDITS and not char.isspace()
-    ]
+    alphabet_filtre = _alphabet_filtre(alphabet)
     if not alphabet_filtre:
         raise ValueError("L'alphabet ne contient aucun caractere autorise.")
     return "".join(random.choice(alphabet_filtre) for _ in range(n))
