@@ -4,3 +4,7 @@
 >> .\virtualEnvDoigtsRapides\bin\activate (Sous Windows)
 >> source ./virtualEnvDoigtsRapides/bin/activate (Sous Linux & macOS)
 >> pip install -r requirements.txt
+>> python main.py
+
+Lancement direct sans activation
+>> ./virtualEnvDoigtsRapides/bin/python main.py

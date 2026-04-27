@@ -1,0 +1,94 @@
+{
+    "type" : "QWERTY",
+    "largeur_réel_clavier" : 27,
+    "hauteur_réel_clavier" : 9,
+    "nb_lignes" : 5,
+    "largeur_par_default" : 1.7,
+    "hauteur_par_default" : 1.7,
+    "touches" : [
+        [
+            {"caracteres": ["#", "|"]},
+            {"caracteres": ["1", "!"]},
+            {"caracteres": ["2", "\""]},
+            {"caracteres": ["3", "/"]},
+            {"caracteres": ["4", "$"]},
+            {"caracteres": ["5", "%"]},
+            {"caracteres": ["6", "?"]},
+            {"caracteres": ["7", "&"]},
+            {"caracteres": ["8", "*"]},
+            {"caracteres": ["9", "("]},
+            {"caracteres": ["0", ")"]},
+            {"caracteres": ["-", "_"]},
+            {"caracteres": ["=", "+"]},
+            {"caracteres": ["delete"], "largeur" : 3.5}
+        ],
+        [
+            {"caracteres": ["tab"], "largeur" : 2.6},
+            {"caracteres": ["q"]},
+            {"caracteres": ["w"]},
+            {"caracteres": ["e"]},
+            {"caracteres": ["r"]},
+            {"caracteres": ["t"]},
+            {"caracteres": ["y"]},
+            {"caracteres": ["u"]},
+            {"caracteres": ["i"]},
+            {"caracteres": ["o"]},
+            {"caracteres": ["p"]},
+            {"caracteres": ["^", "^"]},
+            {"caracteres": ["CEDILLE", "¨"]},
+            {"caracteres": ["enter"], "largeur" : 2.6, "frame_color": 0}
+        ],
+        [
+            {"caracteres": ["fix maj"], "largeur" : 3},
+            {"caracteres": ["a"]},
+            {"caracteres": ["s"]},
+            {"caracteres": ["d"]},
+            {"caracteres": ["f"]},
+            {"caracteres": ["g"]},
+            {"caracteres": ["h"]},
+            {"caracteres": ["j"]},
+            {"caracteres": ["k"]},
+            {"caracteres": ["l"]},
+            {"caracteres": [";", ":"]},
+            {"caracteres": ["`", "`"]},
+            {"caracteres": ["<", ">"]},
+            {"caracteres": ["enter"], "largeur" : 2.2, "frame_color": 0}
+        ],
+        [
+            {"caracteres": ["maj gauche"], "largeur" : 2.2},
+            {"caracteres": ["<<", ">>"]},
+            {"caracteres": ["z"]},
+            {"caracteres": ["x"]},
+            {"caracteres": ["c"]},
+            {"caracteres": ["v"]},
+            {"caracteres": ["b"]},
+            {"caracteres": ["n"]},
+            {"caracteres": ["m"]},
+            {"caracteres": [",", "'"]},
+            {"caracteres": [".", "."]},
+            {"caracteres": ["é", "É"]},
+            {"caracteres": ["maj droit"], "largeur" : 4.7}
+        ],
+        [
+            {"caracteres": ["ctrl gauche"], "largeur" : 2.2},
+            {"caracteres": ["fn"]},
+            {"caracteres": ["windows"]},
+            {"caracteres": ["alt"]},
+            {"caracteres": ["espace"], "largeur" : 10.2},
+            {"caracteres": ["alt droit"], "largeur" : 2.7},
+            {"caracteres": ["menu"], "largeur" : 2.7},
+            {"caracteres": ["ctrl droit"], "largeur" : 2.7}
+        ]
+    ],
+    "compositions_speciales" : {
+        "é": ["'", "e"],
+        "è": ["`", "e"],
+        "ê": ["^", "e"],
+        "ù": ["`", "u"],
+        "à": ["`", "a"],
+        "ô": ["^", "o"],
+        "â": ["^", "a"],
+        "î": ["^", "i"]
+    }
+
+}

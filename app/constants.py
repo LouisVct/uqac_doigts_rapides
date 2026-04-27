@@ -1,0 +1,8 @@
+MODE_FILE = "file"
+MODE_RANDOM_WORDS = "random_words"
+MODE_RANDOM_LETTERS = "random_letters"
+
+DISPLAY_CLASSIC = "classic"
+DISPLAY_FOCUS = "focus"
+
+RANDOM_MODES = {MODE_RANDOM_WORDS, MODE_RANDOM_LETTERS}
